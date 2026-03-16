@@ -74,6 +74,189 @@ html.dark {
 }
 .theme-input::placeholder { color: var(--muted); opacity: 0.6; }
 
+.theme-date {
+  border-radius: 0.9rem;
+  padding: 0.6rem 2.4rem 0.6rem 1rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.2px;
+  box-shadow: inset 0 0 0 1px rgba(200, 184, 154, 0.08);
+}
+.theme-date:focus {
+  border-color: var(--border-hover);
+  box-shadow: 0 0 0 2px rgba(200, 184, 154, 0.14);
+}
+html.dark .theme-date { color-scheme: dark; }
+html:not(.dark) .theme-date { color-scheme: light; }
+.theme-date::-webkit-calendar-picker-indicator {
+  opacity: 0.75;
+  cursor: pointer;
+}
+html.dark .theme-date::-webkit-calendar-picker-indicator {
+  filter: invert(0.9);
+}
+
+.date-picker {
+  position: relative;
+}
+.date-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 40;
+  width: 260px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+}
+.date-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.date-popover-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.date-popover-actions {
+  display: flex;
+  gap: 6px;
+}
+.date-nav {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1;
+}
+.date-popover-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.date-weekday {
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--muted);
+  padding: 4px 0;
+}
+.date-empty {
+  height: 28px;
+}
+.date-day {
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.7rem;
+}
+.date-day:hover {
+  background: var(--accent-bg);
+  border-color: rgba(200, 184, 154, 0.25);
+}
+.date-day.is-selected {
+  background: linear-gradient(135deg, #c8b89a, #a89070);
+  color: #0d0d0f;
+}
+
+.toast-container {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+.toast {
+  min-width: 220px;
+  max-width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  color: var(--text);
+  font-size: 0.8rem;
+}
+.toast.success {
+  border-color: rgba(34, 197, 94, 0.35);
+}
+.toast.danger {
+  border-color: rgba(239, 68, 68, 0.45);
+}
+.toast-text {
+  flex: 1;
+  text-align: center;
+}
+.toast-close {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  line-height: 1;
+  font-size: 0.75rem;
+}
+.toast-close:hover {
+  color: var(--text);
+}
+
+.activity-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 184, 154, 0.6) rgba(0, 0, 0, 0.1);
+}
+.activity-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.activity-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+}
+.activity-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(200, 184, 154, 0.9), rgba(168, 144, 112, 0.9));
+  border-radius: 999px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+}
+.activity-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(200, 184, 154, 1), rgba(168, 144, 112, 1));
+}
+
+.weekly-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 184, 154, 0.6) rgba(0, 0, 0, 0.1);
+}
+.weekly-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.weekly-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+}
+.weekly-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(200, 184, 154, 0.9), rgba(168, 144, 112, 0.9));
+  border-radius: 999px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+}
+.weekly-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(200, 184, 154, 1), rgba(168, 144, 112, 1));
+}
+
 @property --border-angle {
   syntax: "<angle>";
   inherits: false;

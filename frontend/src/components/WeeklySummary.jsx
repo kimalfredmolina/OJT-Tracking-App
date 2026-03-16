@@ -10,7 +10,7 @@ const WeeklySummary = ({ weeks = [] }) => (
       <h2 className="text-[0.75rem] font-semibold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Weekly Summary</h2>
     </div>
 
-    <div className="p-4 space-y-3">
+    <div className="p-4 space-y-3 weekly-scroll" style={{ maxHeight: '520px', overflowY: 'auto' }}>
       {weeks.map((wk, i) => (
         <div key={i} className="rounded-xl p-4 transition-all duration-200" style={{ backgroundColor: 'var(--surface-alt)', border: '1px solid var(--border)' }}
           onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,184,154,0.30)'}
