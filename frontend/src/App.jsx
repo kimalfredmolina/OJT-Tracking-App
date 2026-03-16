@@ -3,10 +3,12 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from './firebase'
 import LoginPage from './authentication/LoginPage'
 import HomePage from './pages/HomePage'
+import RegisterSuccessModal from './components/RegisterSuccessModal'
 
 const App = () => {
   const [user, setUser] = useState(null)
   const [checking, setChecking] = useState(true)
+  const [, setForceUpdate] = useState(0)
 
   const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem('theme') === 'dark'
@@ -27,16 +29,36 @@ const App = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser)
-      setChecking(false)
+      setTimeout(() => {
+        setUser(currentUser)
+        setChecking(false)
+      }, 100)
     })
     return () => unsubscribe()
   }, [])
 
+  const handleCloseSuccess = () => {
+    localStorage.removeItem('showRegisterSuccess')
+    setForceUpdate(prev => prev + 1)
+  }
+
   if (checking) return null
 
+  if (user && localStorage.getItem('showRegisterSuccess') === 'true') {
+    return (
+      <div className="relative">
+        <LoginPage isDark={isDark} toggleTheme={toggleTheme} />
+        <RegisterSuccessModal 
+          isOpen={true} 
+          onClose={handleCloseSuccess}
+          userEmail={user.email}
+        />
+      </div>
+    )
+  }
+
   return user
-    ? <HomePage isDark={isDark} toggleTheme={toggleTheme} />
+    ? <HomePage isDark={isDark} toggleTheme={toggleTheme} user={user} />
     : <LoginPage isDark={isDark} toggleTheme={toggleTheme} />
 }
 

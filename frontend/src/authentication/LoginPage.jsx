@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
+import { GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from 'firebase/auth'
 import { auth } from '../firebase'
 import AnimatedBorderlineCard from '../components/AnimatedBorderlineCard'
 
@@ -14,6 +14,12 @@ const LoginPage = () => {
     setError(null)
     try {
       const result = await signInWithPopup(auth, googleProvider)
+      
+      const { isNewUser } = getAdditionalUserInfo(result)
+      if (isNewUser) {
+        localStorage.setItem('showRegisterSuccess', 'true')
+        localStorage.setItem('needsSetup', 'true')
+      }
 
       const user = result.user
       console.log('Signed in as:', user.displayName, user.email)
