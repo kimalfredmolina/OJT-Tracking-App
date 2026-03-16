@@ -27,7 +27,7 @@ const Navbar = ({ isDark, toggleTheme, onAddLog }) => {
 
   return (
     <header
-      className="sticky top-0 z-30 backdrop-blur-md"
+      className="fixed top-0 left-0 w-full z-30 backdrop-blur-md"
       style={{
         backgroundColor: 'var(--bg-80)',
         borderBottom: '1px solid var(--border)',

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
 const PAD = (n) => String(n).padStart(2, '0')
+const timeToMin = (h, m) => h * 60 + m
 
 const createDefaultEntry = () => {
   const today = new Date().toISOString().slice(0, 10)
@@ -9,6 +10,7 @@ const createDefaultEntry = () => {
     date: today,
     timeIn: { h: 8, m: 0 },
     timeOut: { h: 17, m: 0 },
+    breakHr: 1,
     notes: '',
   }
 }
@@ -203,6 +205,38 @@ const BulkAddModal = ({ isOpen, onClose, onSave }) => {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Hours info banner */}
+              {(() => {
+                const rawHours = (timeToMin(entry.timeOut.h, entry.timeOut.m) - timeToMin(entry.timeIn.h, entry.timeIn.m)) / 60
+                const computedHours = Math.max(0, rawHours - entry.breakHr)
+                return (
+                  <div className="flex items-start gap-3 px-4 py-3 rounded-xl mt-4" style={{ backgroundColor: 'var(--accent-bg)', border: '1px solid rgba(200,184,154,0.25)' }}>
+                    <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" style={{ color: 'var(--accent)' }}>
+                      <circle cx="12" cy="12" r="10" />
+                      <path strokeLinecap="round" d="M12 8v4l3 3" />
+                    </svg>
+                    <p className="text-[0.77rem] leading-relaxed" style={{ color: 'var(--accent)' }}>You worked for <strong>{rawHours.toFixed(1)} hrs</strong>. Only <strong>{computedHours.toFixed(1)} hrs</strong> counted due to <strong>{entry.breakHr} hr</strong> break.</p>
+                  </div>
+                )
+              })()}
+
+              {/* Break */}
+              <div className="mt-4">
+                <label
+                  className="block text-[0.72rem] uppercase tracking-widest mb-1.5"
+                  style={{ color: 'var(--muted)' }}
+                >
+                  Break
+                </label>
+                <select
+                  value={entry.breakHr}
+                  onChange={e => handleChange(entry.id, 'breakHr', +e.target.value)}
+                  className="theme-input w-full rounded-xl px-4 py-2.5 text-[0.85rem] cursor-pointer"
+                >
+                  {[0, 0.5, 1, 1.5, 2].map(v => (<option key={v} value={v}>{v === 0 ? 'No break' : `${v} hr`}</option>))}
+                </select>
               </div>
 
               {/* Notes */}

@@ -84,7 +84,7 @@ const HomePage = ({ isDark, toggleTheme }) => {
 
       <Navbar isDark={isDark} toggleTheme={toggleTheme}onAddLog={() => setModalOpen(true)} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-8 space-y-6">
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">{STAT_CARDS.map(card => (<StatCard key={card.id} {...card} />))}</div>
 
