@@ -11,9 +11,11 @@ import BulkAddModal  from '../components/BulkAddModal'
 import SetupOjtModal from '../components/SetupOjtModal'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import ToastStack from '../components/ToastStack'
+import AccountPage from './AccountPage'
 import {
   onAuthChange,
   deleteLog,
+  deleteAccountAndData,
   saveSettings,
   subscribeLogs,
   subscribeSettings,
@@ -105,6 +107,8 @@ const HomePage = ({ isDark, toggleTheme }) => {
   const [requiredDraft, setRequiredDraft] = useState('')
   const [requiredError, setRequiredError] = useState('')
   const [savingRequired, setSavingRequired] = useState(false)
+  const [activeView, setActiveView] = useState('dashboard')
+  const [deleteAccountOpen, setDeleteAccountOpen] = useState(false)
 
   useEffect(() => {
     const unsub = onAuthChange(u => {
@@ -279,6 +283,25 @@ const HomePage = ({ isDark, toggleTheme }) => {
     }
   }
 
+  const confirmDeleteAccount = async () => {
+    if (!user) return
+    try {
+      await deleteAccountAndData(user)
+      pushToast('Account deleted.', 'danger')
+      setActiveView('dashboard')
+    } catch (err) {
+      if (err?.code === 'auth/requires-recent-login') {
+        pushToast('Please log in again before deleting your account.', 'danger')
+      } else {
+        pushToast(`Delete failed: ${err.message}`, 'danger')
+      }
+    } finally {
+      setDeleteAccountOpen(false)
+    }
+  }
+
+  const isAccountView = activeView === 'account'
+
   return (
     <div
       className="theme-bg theme-text font-sans min-h-screen overflow-x-hidden"
@@ -290,81 +313,97 @@ const HomePage = ({ isDark, toggleTheme }) => {
       <div className="fixed -bottom-24 -right-24 w-[400px] h-[400px] rounded-full pointer-events-none blur-[100px]"
         style={{ background: 'radial-gradient(circle, #7a6a5a, transparent)', opacity: isDark ? 0.1 : 0.07 }} />
 
-      <Navbar isDark={isDark} toggleTheme={toggleTheme} onAddLog={openAddLog} />
+      <Navbar
+        isDark={isDark}
+        toggleTheme={toggleTheme}
+        onAddLog={openAddLog}
+        onOpenAccount={() => setActiveView('account')}
+      />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-8 space-y-6">
+        {isAccountView ? (
+          <AccountPage
+            user={user}
+            logs={displayLogs}
+            settings={settings}
+            onBack={() => setActiveView('dashboard')}
+            onDelete={() => setDeleteAccountOpen(true)}
+          />
+        ) : (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              {statCards.map(card => {
+                if (card.id !== 'stat-required') return <StatCard key={card.id} {...card} />
+                const valueNode = isEditingRequired ? (
+                  <div className="flex flex-col gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      value={requiredDraft}
+                      onChange={e => setRequiredDraft(e.target.value)}
+                      className="theme-input rounded-xl px-3 py-2 text-[1rem] font-semibold"
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={saveRequiredEdit}
+                        disabled={savingRequired}
+                        className="px-3 py-1.5 rounded-lg text-[0.7rem] font-medium"
+                        style={{
+                          background: savingRequired ? 'rgba(200,184,154,0.4)' : 'linear-gradient(135deg, #c8b89a, #a89070)',
+                          color: '#0d0d0f',
+                          cursor: savingRequired ? 'not-allowed' : 'pointer',
+                        }}
+                      >
+                        {savingRequired ? 'Saving...' : 'Save'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelRequiredEdit}
+                        className="px-3 py-1.5 rounded-lg text-[0.7rem]"
+                        style={{ color: 'var(--muted)', border: '1px solid var(--border)' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    {requiredError && (
+                      <span className="text-[0.68rem]" style={{ color: 'var(--danger)' }}>{requiredError}</span>
+                    )}
+                  </div>
+                ) : (
+                  `${required} hrs`
+                )
+                return (
+                  <StatCard
+                    key={card.id}
+                    {...card}
+                    value={valueNode}
+                    onIconClick={!isEditingRequired ? openRequiredEdit : undefined}
+                    iconTitle="Edit required hours"
+                    iconAccent
+                  />
+                )
+              })}
+            </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {statCards.map(card => {
-            if (card.id !== 'stat-required') return <StatCard key={card.id} {...card} />
-            const valueNode = isEditingRequired ? (
-              <div className="flex flex-col gap-2">
-                <input
-                  type="number"
-                  min="1"
-                  value={requiredDraft}
-                  onChange={e => setRequiredDraft(e.target.value)}
-                  className="theme-input rounded-xl px-3 py-2 text-[1rem] font-semibold"
+            <ProgressBar completed={completed} required={required} avgDaily={avgDaily} />
+
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
+              <div className="space-y-6">
+                <ActivityTable
+                  logs={displayLogs}
+                  onAddLog={openAddLog}
+                  onBulkAdd={() => setBulkOpen(true)}
+                  onExport={exportReport}
+                  onEditLog={openEditLog}
+                  onDeleteLog={handleDeleteLog}
                 />
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={saveRequiredEdit}
-                    disabled={savingRequired}
-                    className="px-3 py-1.5 rounded-lg text-[0.7rem] font-medium"
-                    style={{
-                      background: savingRequired ? 'rgba(200,184,154,0.4)' : 'linear-gradient(135deg, #c8b89a, #a89070)',
-                      color: '#0d0d0f',
-                      cursor: savingRequired ? 'not-allowed' : 'pointer',
-                    }}
-                  >
-                    {savingRequired ? 'Saving...' : 'Save'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={cancelRequiredEdit}
-                    className="px-3 py-1.5 rounded-lg text-[0.7rem]"
-                    style={{ color: 'var(--muted)', border: '1px solid var(--border)' }}
-                  >
-                    Cancel
-                  </button>
-                </div>
-                {requiredError && (
-                  <span className="text-[0.68rem]" style={{ color: 'var(--danger)' }}>{requiredError}</span>
-                )}
+                <CalendarView logs={logs} />
               </div>
-            ) : (
-              `${required} hrs`
-            )
-            return (
-              <StatCard
-                key={card.id}
-                {...card}
-                value={valueNode}
-                onIconClick={!isEditingRequired ? openRequiredEdit : undefined}
-                iconTitle="Edit required hours"
-                iconAccent
-              />
-            )
-          })}
-        </div>
-
-        <ProgressBar completed={completed} required={required} avgDaily={avgDaily} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
-          <div className="space-y-6">
-            <ActivityTable
-              logs={displayLogs}
-              onAddLog={openAddLog}
-              onBulkAdd={() => setBulkOpen(true)}
-              onExport={exportReport}
-              onEditLog={openEditLog}
-              onDeleteLog={handleDeleteLog}
-            />
-            <CalendarView logs={logs} />
-          </div>
-          <WeeklySummary weeks={weeklySummaries} />
-        </div>
+              <WeeklySummary weeks={weeklySummaries} />
+            </div>
+          </>
+        )}
       </main>
 
       <footer className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 pt-2">
@@ -415,6 +454,14 @@ const HomePage = ({ isDark, toggleTheme }) => {
         onConfirm={confirmDelete}
         title="Delete Log"
         message="Are you sure you want to delete this log? This action cannot be undone."
+      />
+
+      <DeleteConfirmModal
+        isOpen={deleteAccountOpen}
+        onClose={() => setDeleteAccountOpen(false)}
+        onConfirm={confirmDeleteAccount}
+        title="Delete Account"
+        message="This will permanently delete your account and all of your stored data. This action cannot be undone."
       />
 
       <ToastStack toasts={toasts} onDismiss={dismissToast} />

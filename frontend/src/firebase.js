@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, deleteUser } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getDatabase, ref, set, get, push, update, remove, onValue, off } from "firebase/database";
 
@@ -24,6 +24,12 @@ export const rtdb    = getDatabase(app);
 // ─── Auth helpers ───────────────────────────────────────────────
 export const getCurrentUser = () => auth.currentUser
 export const onAuthChange   = (cb) => auth.onAuthStateChanged(cb)
+
+export const deleteAccountAndData = async (user) => {
+  if (!user?.uid) throw new Error('No authenticated user.')
+  await remove(ref(rtdb, `${user.uid}`))
+  await deleteUser(user)
+}
 
 // ─── Log helpers ────────────────────────────────────────────────
 export const addLog = async (uid, { logDate, timeIn, timeOut, breakHr, computedHours, notes }) => {

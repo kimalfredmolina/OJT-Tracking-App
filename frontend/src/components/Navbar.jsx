@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { auth } from '../firebase'
 import { signOut } from 'firebase/auth'
 
-const Navbar = ({ isDark, toggleTheme, onAddLog }) => {
+const Navbar = ({ isDark, toggleTheme, onAddLog, onOpenAccount }) => {
   const user = auth.currentUser
   const [dropOpen, setDropOpen] = useState(false)
   const dropRef = useRef(null)
@@ -145,6 +145,10 @@ const Navbar = ({ isDark, toggleTheme, onAddLog }) => {
                 </button>
                 <button
                   id="menu-account"
+                  onClick={() => {
+                    onOpenAccount?.()
+                    setDropOpen(false)
+                  }}
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-[0.8rem] text-left transition-colors hover:opacity-80"
                   style={{ color: 'var(--muted)', borderTop: '1px solid var(--border)' }}
                 >
