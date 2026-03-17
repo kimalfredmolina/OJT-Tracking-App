@@ -420,7 +420,9 @@ const HomePage = ({ isDark, toggleTheme }) => {
           >
             GitHub
           </a>
-          <span className="py-4">All rights reserved.</span>
+          <span className="py-4">
+            &copy; {new Date().getFullYear()} All rights reserved.
+          </span>
         </div>
       </footer>
 
