@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import * as XLSX from 'xlsx'
 import Navbar        from '../components/Navbar'
 import StatCard      from '../components/StatCard'
 import ProgressBar   from '../components/ProgressBar'
@@ -178,6 +179,31 @@ const HomePage = ({ isDark, toggleTheme }) => {
     logs.map(l => ({ ...l, displayDate: fmtDate(l.date) })), [logs])
   const weeklySummaries = useMemo(() => buildWeeklySummaries(logs), [logs])
 
+  const exportReport = () => {
+    const rows = displayLogs.map(l => ({
+      Date: l.displayDate ?? l.date ?? '',
+      Hours: l.hours ?? 0,
+      Notes: l.notes ?? '',
+    }))
+    const worksheet = XLSX.utils.json_to_sheet(rows)
+    const workbook = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Activity')
+
+    const data = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+    const blob = new Blob([data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    })
+
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `ojt-activity-${new Date().toISOString().slice(0, 10)}.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
   const openRequiredEdit = () => {
     setRequiredDraft(String(required))
     setRequiredError('')
@@ -331,6 +357,7 @@ const HomePage = ({ isDark, toggleTheme }) => {
               logs={displayLogs}
               onAddLog={openAddLog}
               onBulkAdd={() => setBulkOpen(true)}
+              onExport={exportReport}
               onEditLog={openEditLog}
               onDeleteLog={handleDeleteLog}
             />
@@ -339,6 +366,24 @@ const HomePage = ({ isDark, toggleTheme }) => {
           <WeeklySummary weeks={weeklySummaries} />
         </div>
       </main>
+
+      <footer className="max-w-7xl mx-auto px-4 sm:px-6 pb-10 pt-2">
+        <div
+          className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[0.75rem]"
+          style={{ color: 'var(--muted)', borderTop: '1px solid var(--border)' }}
+        >
+          <a
+            href="https://github.com/kimalfredmolina/OJT-Tracking_System"
+            target="_blank"
+            rel="noreferrer"
+            className="py-4 hover:underline"
+            style={{ color: 'var(--accent)' }}
+          >
+            GitHub
+          </a>
+          <span className="py-4">All rights reserved.</span>
+        </div>
+      </footer>
 
       <AddLogModal
         isOpen={modalOpen}

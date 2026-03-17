@@ -2,12 +2,15 @@ import React, { useState } from 'react'
 import { GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from 'firebase/auth'
 import { auth } from '../firebase'
 import AnimatedBorderlineCard from '../components/AnimatedBorderlineCard'
+import LegalModal from '../components/LegalModal'
 
 const googleProvider = new GoogleAuthProvider()
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [legalOpen, setLegalOpen] = useState(false)
+  const [legalTab, setLegalTab] = useState('terms')
 
   const handleGoogleSignIn = async () => {
     setLoading(true)
@@ -52,7 +55,7 @@ const LoginPage = () => {
 
         <h1 className="text-[2rem] font-normal tracking-tight text-[#f0ede8] leading-tight mb-2"
           style={{ fontFamily: "'DM Serif Display', serif" }}>
-          Welcome back
+          Welcome
         </h1>
         <p className="text-sm font-light text-[#7a7a8a] mb-10 leading-relaxed">
           Sign in to continue to your workspace.
@@ -95,11 +98,36 @@ const LoginPage = () => {
 
         <p className="mt-8 text-center text-[0.75rem] text-[#7a7a8a] leading-relaxed">
           By signing in, you agree to our{' '}
-          <a href="#" className="text-[#c8b89a] hover:underline">Terms of Service</a>
+          <button
+            type="button"
+            className="text-[#c8b89a] hover:underline"
+            onClick={() => {
+              setLegalTab('terms')
+              setLegalOpen(true)
+            }}
+          >
+            Terms of Service
+          </button>
           {' '}and{' '}
-          <a href="#" className="text-[#c8b89a] hover:underline">Privacy Policy</a>.
+          <button
+            type="button"
+            className="text-[#c8b89a] hover:underline"
+            onClick={() => {
+              setLegalTab('privacy')
+              setLegalOpen(true)
+            }}
+          >
+            Privacy Policy
+          </button>
+          .
         </p>
       </AnimatedBorderlineCard>
+
+      <LegalModal
+        isOpen={legalOpen}
+        defaultTab={legalTab}
+        onClose={() => setLegalOpen(false)}
+      />
     </div>
   )
 }

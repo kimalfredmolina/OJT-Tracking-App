@@ -5,8 +5,9 @@ import React from 'react'
  * @prop {Array}     logs      – [{ id, date, hours, notes }]
  * @prop {Function}  onAddLog  – callback when + Add is clicked
  * @prop {Function}  onBulkAdd – callback when Bulk Add is clicked
+ * @prop {Function}  onExport  – callback when Export is clicked
  */
-const ActivityTable = ({ logs = [], onAddLog, onBulkAdd, onEditLog, onDeleteLog }) => (
+const ActivityTable = ({ logs = [], onAddLog, onBulkAdd, onExport, onEditLog, onDeleteLog }) => (
   <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
     <div className="px-5 sm:px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
       <h2 className="text-[0.75rem] font-semibold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Recent Activity</h2>
@@ -16,7 +17,7 @@ const ActivityTable = ({ logs = [], onAddLog, onBulkAdd, onEditLog, onDeleteLog 
           <button
             type="button"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.7rem] font-medium transition-all"
-            style={{ color: 'var(--muted)', border: '1px solid var(--border)' }}
+            style={{ color: 'var(--muted)', border: '1px solid rgba(200,184,154,0.45)' }}
             onMouseEnter={e => {
               e.currentTarget.style.color = 'var(--accent)'
               e.currentTarget.style.borderColor = 'rgba(200,184,154,0.7)'
@@ -25,29 +26,7 @@ const ActivityTable = ({ logs = [], onAddLog, onBulkAdd, onEditLog, onDeleteLog 
             }}
             onMouseLeave={e => {
               e.currentTarget.style.color = 'var(--muted)'
-              e.currentTarget.style.borderColor = 'var(--border)'
-              e.currentTarget.style.boxShadow = 'none'
-              e.currentTarget.style.backgroundColor = 'transparent'
-            }}
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h10M4 18h6" />
-            </svg>
-            Select
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.7rem] font-medium transition-all"
-            style={{ color: 'var(--muted)', border: '1px solid var(--border)' }}
-            onMouseEnter={e => {
-              e.currentTarget.style.color = 'var(--accent)'
-              e.currentTarget.style.borderColor = 'rgba(200,184,154,0.7)'
-              e.currentTarget.style.boxShadow = '0 0 0 1px rgba(200,184,154,0.35)'
-              e.currentTarget.style.backgroundColor = 'var(--accent-bg)'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.color = 'var(--muted)'
-              e.currentTarget.style.borderColor = 'var(--border)'
+              e.currentTarget.style.borderColor = 'rgba(200,184,154,0.45)'
               e.currentTarget.style.boxShadow = 'none'
               e.currentTarget.style.backgroundColor = 'transparent'
             }}
@@ -61,7 +40,7 @@ const ActivityTable = ({ logs = [], onAddLog, onBulkAdd, onEditLog, onDeleteLog 
           <button
             type="button"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.7rem] font-medium transition-all"
-            style={{ color: 'var(--muted)', border: '1px solid var(--border)' }}
+            style={{ color: 'var(--muted)', border: '1px solid rgba(200,184,154,0.45)' }}
             onMouseEnter={e => {
               e.currentTarget.style.color = 'var(--accent)'
               e.currentTarget.style.borderColor = 'rgba(200,184,154,0.7)'
@@ -70,7 +49,31 @@ const ActivityTable = ({ logs = [], onAddLog, onBulkAdd, onEditLog, onDeleteLog 
             }}
             onMouseLeave={e => {
               e.currentTarget.style.color = 'var(--muted)'
-              e.currentTarget.style.borderColor = 'var(--border)'
+              e.currentTarget.style.borderColor = 'rgba(200,184,154,0.45)'
+              e.currentTarget.style.boxShadow = 'none'
+              e.currentTarget.style.backgroundColor = 'transparent'
+            }}
+            onClick={onExport}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12m0 0l3-3m-3 3l-3-3" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 15v4a2 2 0 002 2h12a2 2 0 002-2v-4" />
+            </svg>
+            Export
+          </button>
+          <button
+            type="button"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.7rem] font-medium transition-all"
+            style={{ color: 'var(--muted)', border: '1px solid rgba(200,184,154,0.45)' }}
+            onMouseEnter={e => {
+              e.currentTarget.style.color = 'var(--accent)'
+              e.currentTarget.style.borderColor = 'rgba(200,184,154,0.7)'
+              e.currentTarget.style.boxShadow = '0 0 0 1px rgba(200,184,154,0.35)'
+              e.currentTarget.style.backgroundColor = 'var(--accent-bg)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.color = 'var(--muted)'
+              e.currentTarget.style.borderColor = 'rgba(200,184,154,0.45)'
               e.currentTarget.style.boxShadow = 'none'
               e.currentTarget.style.backgroundColor = 'transparent'
             }}
