@@ -257,6 +257,19 @@ html.dark .theme-date::-webkit-calendar-picker-indicator {
   background: linear-gradient(180deg, rgba(200, 184, 154, 1), rgba(168, 144, 112, 1));
 }
 
+.notes-clamp-mobile {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+@media (min-width: 640px) {
+  .notes-clamp-mobile {
+    display: block;
+    overflow: visible;
+  }
+}
+
 @property --border-angle {
   syntax: "<angle>";
   inherits: false;

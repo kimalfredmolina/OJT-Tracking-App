@@ -21,8 +21,26 @@ const CalendarView = ({ logs = [] }) => {
   const firstDay    = new Date(calYear, calMonth, 1).getDay()
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate()
   const currentYear = today.getFullYear()
-  const yearOptions = []
-  for (let y = currentYear - 5; y <= currentYear + 5; y += 1) yearOptions.push(y)
+
+  const goPrevMonth = () => {
+    setCalMonth(prev => {
+      if (prev === 0) {
+        setCalYear(y => y - 1)
+        return 11
+      }
+      return prev - 1
+    })
+  }
+
+  const goNextMonth = () => {
+    setCalMonth(prev => {
+      if (prev === 11) {
+        setCalYear(y => y + 1)
+        return 0
+      }
+      return prev + 1
+    })
+  }
 
   const loggedDays = useMemo(() => {
     const set = new Set()
@@ -51,29 +69,34 @@ const CalendarView = ({ logs = [] }) => {
       <div className="px-5 sm:px-6 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-[0.75rem] font-semibold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
-            {monthName} {calYear}
+            Calendar
           </h2>
           <div className="flex items-center gap-2">
-            <select
-              value={calMonth}
-              onChange={e => setCalMonth(Number(e.target.value))}
-              className="theme-input rounded-lg px-2 py-1 text-[0.7rem]"
-              aria-label="Select month"
+            <button
+              type="button"
+              onClick={goPrevMonth}
+              className="w-7 h-7 flex items-center justify-center rounded-lg transition-all"
+              style={{ color: 'var(--muted)', border: '1px solid var(--border)' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-hover)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+              aria-label="Previous month"
             >
-              {MONTHS.map((m, idx) => (
-                <option key={m} value={idx}>{m}</option>
-              ))}
-            </select>
-            <select
-              value={calYear}
-              onChange={e => setCalYear(Number(e.target.value))}
-              className="theme-input rounded-lg px-2 py-1 text-[0.7rem]"
-              aria-label="Select year"
+              <span className="text-sm">&lt;</span>
+            </button>
+            <div className="text-[0.8rem] font-medium theme-text">
+              {monthName} {calYear}
+            </div>
+            <button
+              type="button"
+              onClick={goNextMonth}
+              className="w-7 h-7 flex items-center justify-center rounded-lg transition-all"
+              style={{ color: 'var(--muted)', border: '1px solid var(--border)' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--border-hover)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
+              aria-label="Next month"
             >
-              {yearOptions.map(y => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
+              <span className="text-sm">&gt;</span>
+            </button>
           </div>
         </div>
       </div>

@@ -54,7 +54,7 @@ const AddLogModal = ({ isOpen, onClose, onSave, isDark, initialLog = null }) => 
       setTimeIn(parseTimeStr(initialLog.timeIn, { h: 9, m: 30, p: 'AM' }))
       setTimeOut(parseTimeStr(initialLog.timeOut, { h: 6, m: 30, p: 'PM' }))
       setBreakHr(Number(initialLog.breakHr ?? 1))
-      setNotes(limitWords(initialLog.notes || '', 25))
+      setNotes(limitWords(initialLog.notes || '', 30))
       setError('')
       return
     }
@@ -210,7 +210,7 @@ const AddLogModal = ({ isOpen, onClose, onSave, isDark, initialLog = null }) => 
             <textarea
               rows={3}
               value={notes}
-              onChange={e => setNotes(limitWords(e.target.value, 25))}
+              onChange={e => setNotes(limitWords(e.target.value, 30))}
               placeholder="Describe the work you did today…"
               className="theme-input w-full rounded-xl px-4 py-3 text-[0.85rem] resize-none"
             />

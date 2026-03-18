@@ -11,6 +11,7 @@ import BulkAddModal  from '../components/BulkAddModal'
 import SetupOjtModal from '../components/SetupOjtModal'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import ToastStack from '../components/ToastStack'
+import NoteViewModal from '../components/NoteViewModal'
 import AccountPage from './AccountPage'
 import {
   onAuthChange,
@@ -109,6 +110,7 @@ const HomePage = ({ isDark, toggleTheme }) => {
   const [savingRequired, setSavingRequired] = useState(false)
   const [activeView, setActiveView] = useState('dashboard')
   const [deleteAccountOpen, setDeleteAccountOpen] = useState(false)
+  const [noteViewLog, setNoteViewLog] = useState(null)
 
   useEffect(() => {
     const unsub = onAuthChange(u => {
@@ -395,6 +397,7 @@ const HomePage = ({ isDark, toggleTheme }) => {
                   onAddLog={openAddLog}
                   onBulkAdd={() => setBulkOpen(true)}
                   onExport={exportReport}
+                  onViewNote={setNoteViewLog}
                   onEditLog={openEditLog}
                   onDeleteLog={handleDeleteLog}
                 />
@@ -464,6 +467,12 @@ const HomePage = ({ isDark, toggleTheme }) => {
         onConfirm={confirmDeleteAccount}
         title="Delete Account"
         message="This will permanently delete your account and all of your stored data. This action cannot be undone."
+      />
+
+      <NoteViewModal
+        isOpen={Boolean(noteViewLog)}
+        onClose={() => setNoteViewLog(null)}
+        log={noteViewLog}
       />
 
       <ToastStack toasts={toasts} onDismiss={dismissToast} />

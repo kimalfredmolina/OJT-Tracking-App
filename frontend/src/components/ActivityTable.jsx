@@ -6,8 +6,9 @@ import React from 'react'
  * @prop {Function}  onAddLog  – callback when + Add is clicked
  * @prop {Function}  onBulkAdd – callback when Bulk Add is clicked
  * @prop {Function}  onExport  – callback when Export is clicked
+ * @prop {Function}  onViewNote – callback when View is clicked
  */
-const ActivityTable = ({ logs = [], onAddLog, onBulkAdd, onExport, onEditLog, onDeleteLog }) => (
+const ActivityTable = ({ logs = [], onAddLog, onBulkAdd, onExport, onViewNote, onEditLog, onDeleteLog }) => (
   <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
     <div className="px-5 sm:px-6 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
       <h2 className="text-[0.75rem] font-semibold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Recent Activity</h2>
@@ -108,7 +109,21 @@ const ActivityTable = ({ logs = [], onAddLog, onBulkAdd, onExport, onEditLog, on
             <tr key={log.id} className="transition-colors" style={{ borderBottom: i !== logs.length - 1 ? '1px solid var(--border)' : 'none' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(128,128,128,0.04)'} onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}>
               <td className="px-5 sm:px-6 py-3.5 font-medium" style={{ color: 'var(--accent)' }}>{log.displayDate ?? log.date}</td>
               <td className="px-5 sm:px-6 py-3.5" style={{ color: 'var(--text)' }}>{log.hours} hrs</td>
-              <td className="px-5 sm:px-6 py-3.5" style={{ color: 'var(--muted)' }}>{log.notes}</td>
+              <td className="px-5 sm:px-6 py-3.5" style={{ color: 'var(--muted)' }}>
+                <div className="space-y-1">
+                  <p className="notes-clamp-mobile">{log.notes}</p>
+                  {log.notes ? (
+                    <button
+                      type="button"
+                      className="sm:hidden text-[0.7rem] underline"
+                      style={{ color: 'var(--accent)' }}
+                      onClick={() => onViewNote?.(log)}
+                    >
+                      View
+                    </button>
+                  ) : null}
+                </div>
+              </td>
               <td className="px-5 sm:px-6 py-3.5">
                 <div className="flex items-center gap-2">
                   <button

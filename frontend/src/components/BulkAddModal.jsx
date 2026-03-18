@@ -169,7 +169,7 @@ const BulkAddModal = ({ isOpen, onClose, onSave }) => {
               <div className="mt-4">
                 <label className="block text-[0.72rem] uppercase mb-1.5" style={{ color: 'var(--muted)' }}>Notes</label>
                 <textarea rows={2} value={entry.notes}
-                  onChange={e => handleChange(entry.id, 'notes', limitWords(e.target.value, 25))}
+                  onChange={e => handleChange(entry.id, 'notes', limitWords(e.target.value, 30))}
                   className="theme-input w-full rounded-xl px-4 py-2.5 text-[0.85rem]"
                   placeholder="Describe the work for this entry…"
                 />
