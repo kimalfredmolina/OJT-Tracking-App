@@ -62,7 +62,13 @@ const WeeklySummary = ({ weeks = [] }) => {
             </div>
 
             <div className="w-full h-1 rounded-full mb-3" style={{ backgroundColor: 'rgba(128,128,128,0.1)' }}>
-              <div className="h-full rounded-full" style={{ width: `${(wk.total / 48) * 100}%`, background: 'linear-gradient(90deg, #c8b89a, #a89070)' }} />
+              <div
+  className="h-full rounded-full"
+  style={{
+    width: `${Math.min((wk.total / 40) * 100, 100)}%`,
+    background: 'linear-gradient(90deg, #c8b89a, #a89070)',
+  }}
+/>
             </div>
 
             <ul className="space-y-1">
