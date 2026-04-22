@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { addLog, deleteLog, getCurrentUser, updateLog } from '../firebase'
 import DatePicker from './DatePicker'
+import { TimePicker } from './TimePicker'
 import { formatHours } from '../utils/format'
-
-const PAD = (n) => String(n).padStart(2, '0')
 
 const toMinutes = ({ h, m, p }) => {
   let hour = h % 12
@@ -26,63 +25,44 @@ const limitWords = (value, maxWords) => {
   return words.slice(0, maxWords).join(' ')
 }
 
-/**
- * AddLogModal
- * @prop {boolean}  isOpen
- * @prop {function} onClose
- * @prop {function} onSave   – called with the saved log data after DB write
- * @prop {boolean}  isDark
- * @prop {string}   initialDate
- */
 const AddLogModal = ({ isOpen, onClose, onSave, isDark, initialLog = null, initialDate = '' }) => {
   const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), [])
   const isEdit = Boolean(initialLog && initialLog.id)
 
   const [logDate,  setLogDate]  = useState(todayStr)
-  const [timeIn,   setTimeIn]   = useState({ h: 9,  m: 30, p: 'AM' })
-  const [timeOut,  setTimeOut]  = useState({ h: 6,  m: 30, p: 'PM' })
+  const [timeIn,   setTimeIn]   = useState({ h: 8,  m: 0, p: 'AM' })
+  const [timeOut,  setTimeOut]  = useState({ h: 5,  m: 0, p: 'PM' })
   const [breakHr,  setBreakHr]  = useState(1)
   const [notes,    setNotes]    = useState('')
   const [saving,   setSaving]   = useState(false)
   const [error,    setError]    = useState('')
 
-  const rawHours       = (toMinutes(timeOut) - toMinutes(timeIn)) / 60
-  const computedHours  = Math.max(0, rawHours - breakHr)
+  const rawHours      = (toMinutes(timeOut) - toMinutes(timeIn)) / 60
+  const computedHours = Math.max(0, rawHours - breakHr)
 
   useEffect(() => {
     if (!isOpen) return
+    setError('')
     if (isEdit) {
       setLogDate(initialLog.date || todayStr)
-      setTimeIn(parseTimeStr(initialLog.timeIn, { h: 9, m: 30, p: 'AM' }))
-      setTimeOut(parseTimeStr(initialLog.timeOut, { h: 6, m: 30, p: 'PM' }))
+      setTimeIn(parseTimeStr(initialLog.timeIn,  { h: 8, m: 0, p: 'AM' }))
+      setTimeOut(parseTimeStr(initialLog.timeOut, { h: 5, m: 0, p: 'PM' }))
       setBreakHr(Number(initialLog.breakHr ?? 1))
-      setNotes(limitWords(initialLog.notes || '', 30))
-      setError('')
-      return
+      setNotes(initialLog.notes || '')
+    } else {
+      setLogDate(initialDate || todayStr)
+      setTimeIn({ h: 8, m: 0, p: 'AM' })
+      setTimeOut({ h: 5, m: 0, p: 'PM' })
+      setBreakHr(1)
+      setNotes('')
     }
-    setLogDate(initialDate || todayStr)
-    setTimeIn({ h: 9, m: 30, p: 'AM' })
-    setTimeOut({ h: 6, m: 30, p: 'PM' })
-    setBreakHr(1)
-    setNotes('')
-    setError('')
   }, [isOpen, isEdit, initialLog, todayStr, initialDate])
 
   const handleSave = async () => {
-    if (rawHours <= 0) {
-      setError('Time Out must be later than Time In.')
-      return
-    }
-
+    if (rawHours <= 0) { setError('Time Out must be later than Time In.'); return }
     const user = getCurrentUser()
-    if (!user) {
-      setError('You must be signed in to save logs.')
-      return
-    }
-
-    setSaving(true)
-    setError('')
-
+    if (!user) { setError('You must be signed in to save logs.'); return }
+    setSaving(true); setError('')
     try {
       const logData = { logDate, timeIn, timeOut, breakHr, computedHours, notes }
       if (isEdit) {
@@ -95,7 +75,7 @@ const AddLogModal = ({ isOpen, onClose, onSave, isDark, initialLog = null, initi
           onSave?.({ ...logData, id: newKey }, 'edit')
         }
       } else {
-        const newKey  = await addLog(user.uid, logData)
+        const newKey = await addLog(user.uid, logData)
         onSave?.({ ...logData, id: newKey }, 'add')
       }
       onClose()
@@ -116,11 +96,7 @@ const AddLogModal = ({ isOpen, onClose, onSave, isDark, initialLog = null, initi
     >
       <div
         className="w-full max-w-md rounded-2xl overflow-visible"
-        style={{
-          backgroundColor: 'var(--surface)',
-          border: '1px solid var(--border)',
-          boxShadow: 'var(--shadow-modal)',
-        }}
+        style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-modal)' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: '1px solid var(--border)' }}>
@@ -137,76 +113,40 @@ const AddLogModal = ({ isOpen, onClose, onSave, isDark, initialLog = null, initi
 
         {/* Body */}
         <div className="px-6 py-5 space-y-4">
-
-          {/* Date */}
           <div>
             <label className="block text-[0.72rem] uppercase tracking-widest mb-1.5" style={{ color: 'var(--muted)' }}>Date</label>
             <DatePicker value={logDate} onChange={setLogDate} />
           </div>
 
-          {/* Time In / Out */}
           <div className="grid grid-cols-2 gap-4">
-            {[
-              { label: 'Time In',  val: timeIn,  set: setTimeIn  },
-              { label: 'Time Out', val: timeOut, set: setTimeOut },
-            ].map(({ label, val, set }) => (
-              <div key={label}>
-                <label className="block text-[0.72rem] uppercase tracking-widest mb-1.5" style={{ color: 'var(--muted)' }}>
-                  {label}
-                </label>
-                <div
-                  className="flex items-center gap-1 rounded-xl px-3 py-2.5"
-                  style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border)' }}
-                >
-                  <input type="number" min="1" max="12" value={PAD(val.h)}
-                    onChange={e => set(p => ({ ...p, h: Math.min(12, Math.max(1, Number(e.target.value))) }))}
-                    className="w-8 bg-transparent text-[0.85rem] text-center focus:outline-none"
-                    style={{ color: 'var(--text)' }}
-                  />
-                  <span style={{ color: 'var(--muted)' }}>:</span>
-                  <input type="number" min="0" max="59" value={PAD(val.m)}
-                    onChange={e => set(p => ({ ...p, m: Number(e.target.value) % 60 }))}
-                    className="w-8 bg-transparent text-[0.85rem] text-center focus:outline-none"
-                    style={{ color: 'var(--text)' }}
-                  />
-                  <select value={val.p} onChange={e => set(p => ({ ...p, p: e.target.value }))}
-                    className="ml-1 text-[0.7rem] bg-transparent focus:outline-none"
-                    style={{ color: 'var(--muted)' }}
-                  >
-                    <option value="AM">AM</option>
-                    <option value="PM">PM</option>
-                  </select>
-                </div>
-              </div>
-            ))}
+            <div>
+              <label className="block text-[0.72rem] uppercase tracking-widest mb-1.5" style={{ color: 'var(--muted)' }}>Time In</label>
+              <TimePicker value={timeIn} onChange={setTimeIn} />
+            </div>
+            <div>
+              <label className="block text-[0.72rem] uppercase tracking-widest mb-1.5" style={{ color: 'var(--muted)' }}>Time Out</label>
+              <TimePicker value={timeOut} onChange={setTimeOut} />
+            </div>
           </div>
 
-          {/* Hours info banner */}
           <div className="flex items-start gap-3 px-4 py-3 rounded-xl" style={{ backgroundColor: 'var(--accent-bg)', border: '1px solid rgba(200,184,154,0.25)' }}>
             <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24" style={{ color: 'var(--accent)' }}>
-              <circle cx="12" cy="12" r="10" />
-              <path strokeLinecap="round" d="M12 8v4l3 3" />
+              <circle cx="12" cy="12" r="10" /><path strokeLinecap="round" d="M12 8v4l3 3" />
             </svg>
             <p className="text-[0.77rem] leading-relaxed" style={{ color: isDark ? '#c8b89a' : '#8a6a40' }}>
               You worked for <strong>{formatHours(rawHours)} hrs</strong>. Only <strong>{formatHours(computedHours)} hrs</strong> counted due to <strong>{breakHr} hr</strong> break.
             </p>
           </div>
 
-          {/* Break */}
           <div>
             <label className="block text-[0.72rem] uppercase tracking-widest mb-1.5" style={{ color: 'var(--muted)' }}>Break</label>
-            <select
-              value={breakHr}
-              onChange={e => setBreakHr(+e.target.value)}
-              className="theme-input w-full rounded-xl px-4 py-2.5 text-[0.85rem]"
-            >
+            <select value={breakHr} onChange={e => setBreakHr(+e.target.value)} className="theme-input w-full rounded-xl px-4 py-2.5 text-[0.85rem]">
               {[0, 0.5, 1, 1.5, 2].map(v => (
                 <option key={v} value={v}>{v === 0 ? 'No break' : `${v} hr`}</option>
               ))}
             </select>
           </div>
 
-          {/* Notes */}
           <div>
             <label className="block text-[0.72rem] uppercase tracking-widest mb-1.5" style={{ color: 'var(--muted)' }}>Notes</label>
             <textarea
@@ -218,7 +158,6 @@ const AddLogModal = ({ isOpen, onClose, onSave, isDark, initialLog = null, initi
             />
           </div>
 
-          {/* Error */}
           {error && (
             <p className="text-[0.78rem] px-4 py-2 rounded-xl" style={{ color: '#e07070', backgroundColor: 'rgba(224,112,112,0.1)', border: '1px solid rgba(224,112,112,0.25)' }}>
               {error}
